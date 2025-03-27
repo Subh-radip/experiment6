@@ -1,0 +1,26 @@
+class Facility:
+    def __init__(self, name):
+        self.name = name
+        self.bookings = []
+
+    def book(self, user, date, time):
+        if (date, time) in self.bookings:
+            print(f"{self.name} is already booked for {date} at {time}.")
+        else:
+            self.bookings.append((date, time, user))
+            print(f"Booking confirmed for {user} on {date} at {time}.")
+
+    def show_bookings(self):
+        if not self.bookings:
+            print(f"No bookings for {self.name}.")
+        else:
+            print(f"Bookings for {self.name}:")
+            for date, time, user in self.bookings:
+                print(f" - {date} at {time} by {user}")
+
+
+if __name__ == "__main__":
+    court = Facility("Basketball Court")
+    court.book("SUBHRADIP", "2025-04-01", "10:00 AM")
+    court.book("VAMSHI", "2025-04-01", "11:00 AM")
+    court.show_bookings()
