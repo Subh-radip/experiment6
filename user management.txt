@@ -1,0 +1,20 @@
+class User:
+    users = {}
+
+    def _init_(self, username, password):
+        self.username = username
+        self.password = password
+        User.users[username] = password
+
+    @staticmethod
+    def login(username, password):
+        if username in User.users and User.users[username] == password:
+            print(f"Welcome, {username}!")
+            return True
+        print("Invalid username or password.")
+        return False
+
+
+if _name_ == "_main_":
+    user1 = User("alice", "pass123")
+    User.login("alice", "pass123")
