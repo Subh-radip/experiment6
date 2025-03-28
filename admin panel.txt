@@ -1,0 +1,24 @@
+class Admin:
+    def _init_(self, name):
+        self.name = name
+        self.facilities = {}
+
+    def add_facility(self, facility_name):
+        if facility_name in self.facilities:
+            print(f"{facility_name} already exists.")
+        else:
+            self.facilities[facility_name] = []
+            print(f"{facility_name} added successfully.")
+
+    def remove_facility(self, facility_name):
+        if facility_name in self.facilities:
+            del self.facilities[facility_name]
+            print(f"{facility_name} removed successfully.")
+        else:
+            print(f"{facility_name} not found.")
+
+
+if _name_ == "_main_":
+    admin = Admin("Admin1")
+    admin.add_facility("Tennis Court")
+    admin.remove_facility("Tennis Court")
