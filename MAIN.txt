@@ -1,26 +1,44 @@
 class Facility:
-    def __init__(self, name):
+    def _init_(self, name):
         self.name = name
-        self.bookings = []
+        self.bookings = []  # Stores (date, start_time, end_time, user)
 
-    def book(self, user, date, time):
-        if (date, time) in self.bookings:
-            print(f"{self.name} is already booked for {date} at {time}.")
+    def is_time_conflicting(self, date, start_time, end_time):
+        for booked_date, booked_start, booked_end, _ in self.bookings:
+            if booked_date == date:  # Check only on the same date
+                # Convert times to comparable values (assuming HH:MM AM/PM format)
+                from datetime import datetime
+                fmt = "%I:%M %p"  # Format for 12-hour time with AM/PM
+                start = datetime.strptime(start_time, fmt)
+                end = datetime.strptime(end_time, fmt)
+                booked_start = datetime.strptime(booked_start, fmt)
+                booked_end = datetime.strptime(booked_end, fmt)
+
+                # Check if the new booking overlaps with an existing one
+                if (start < booked_end and end > booked_start):  
+                    return True  # Conflict found
+        return False
+
+    def book(self, user, date, start_time, end_time):
+        if self.is_time_conflicting(date, start_time, end_time):
+            print(f"⚠ Booking conflict: {self.name} is already booked during this time.")
         else:
-            self.bookings.append((date, time, user))
-            print(f"Booking confirmed for {user} on {date} at {time}.")
+            self.bookings.append((date, start_time, end_time, user))
+            print(f"✅ Booking confirmed for {user} on {date} from {start_time} to {end_time}.")
 
     def show_bookings(self):
         if not self.bookings:
             print(f"No bookings for {self.name}.")
         else:
-            print(f"Bookings for {self.name}:")
-            for date, time, user in self.bookings:
-                print(f" - {date} at {time} by {user}")
+            print(f"📅 Bookings for {self.name}:")
+            for date, start_time, end_time, user in self.bookings:
+                print(f" - {date}: {start_time} to {end_time} by {user}")
 
 
-if __name__ == "__main__":
+# Example Usage
+if _name_ == "_main_":
     court = Facility("Basketball Court")
-    court.book("SUBHRADIP", "2025-04-01", "10:00 AM")
-    court.book("VAMSHI", "2025-04-01", "11:00 AM")
+    court.book("SUBHRADIP", "2025-04-01", "10:00 AM", "11:00 AM")
+    court.book("VAMSHI", "2025-04-01", "10:30 AM", "11:30 AM")  # Should show conflict
+    court.book("RAHUL", "2025-04-01", "11:30 AM", "12:30 PM")  # Should be successful
     court.show_bookings()
