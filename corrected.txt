@@ -3,39 +3,42 @@ class Facility:
         self.name = name
         self.bookings = []  # Stores (date, start_time, end_time, user)
 
+    def is_time_conflicting(self, date, start_time, end_time):
+        for booked_date, booked_start, booked_end, _ in self.bookings:
+            if booked_date == date:  # Check only on the same date
+                # Convert times to comparable values (assuming HH:MM AM/PM format)
+                from datetime import datetime
+                fmt = "%I:%M %p"  # Format for 12-hour time with AM/PM
+                start = datetime.strptime(start_time, fmt)
+                end = datetime.strptime(end_time, fmt)
+                booked_start = datetime.strptime(booked_start, fmt)
+                booked_end = datetime.strptime(booked_end, fmt)
+
+                # Check if the new booking overlaps with an existing one
+                if (start < booked_end and end > booked_start):  
+                    return True  # Conflict found
+        return False
+
     def book(self, user, date, start_time, end_time):
-        """Books the facility if no overlapping bookings exist."""
-        for d, s, e, u in self.bookings:
-            if d == date and not (end_time <= s or start_time >= e):
-                print(f"{self.name} is already booked from {s} to {e} on {date}.")
-                return
-
-        self.bookings.append((date, start_time, end_time, user))
-        print(f"Booking confirmed for {user} on {date} from {start_time} to {end_time}.")
-
-    def cancel_booking(self, user, date, start_time, end_time):
-        """Cancels a booking if it exists."""
-        for booking in self.bookings:
-            if booking == (date, start_time, end_time, user):
-                self.bookings.remove(booking)
-                print(f"Booking for {user} on {date} from {start_time} to {end_time} canceled.")
-                return
-        print("No matching booking found to cancel.")
+        if self.is_time_conflicting(date, start_time, end_time):
+            print(f"⚠ Booking conflict: {self.name} is already booked during this time.")
+        else:
+            self.bookings.append((date, start_time, end_time, user))
+            print(f"✅ Booking confirmed for {user} on {date} from {start_time} to {end_time}.")
 
     def show_bookings(self):
-        """Displays all bookings."""
         if not self.bookings:
             print(f"No bookings for {self.name}.")
         else:
-            print(f"Bookings for {self.name}:")
+            print(f"📅 Bookings for {self.name}:")
             for date, start_time, end_time, user in self.bookings:
                 print(f" - {date}: {start_time} to {end_time} by {user}")
 
 
-# Example usage
+# Example Usage
 if _name_ == "_main_":
     court = Facility("Basketball Court")
     court.book("SUBHRADIP", "2025-04-01", "10:00 AM", "11:00 AM")
-    court.book("VAMSHI", "2025-04-01", "10:30 AM", "11:30 AM")  # Overlapping booking
-    court.cancel_booking("SUBHRADIP", "2025-04-01", "10:00 AM", "11:00 AM")
+    court.book("VAMSHI", "2025-04-01", "10:30 AM", "11:30 AM")  # Should show conflict
+    court.book("RAHUL", "2025-04-01", "11:30 AM", "12:30 PM")  # Should be successful
     court.show_bookings()
